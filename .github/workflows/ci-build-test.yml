@@ -1,0 +1,67 @@
+name: Build and Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - '5432:5432'
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL_IAM: postgresql://postgres:postgres@localhost:5432/iam_test
+      DATABASE_URL_NOTIFY: postgresql://postgres:postgres@localhost:5432/notify_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install protoc
+        run: sudo apt-get install -y protobuf-compiler
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate proto types
+        run: npm run proto:gen
+
+      - name: Create test databases
+        run: |
+          psql postgresql://postgres:postgres@localhost:5432/postgres \
+            -c "CREATE DATABASE iam_test;"
+          psql postgresql://postgres:postgres@localhost:5432/postgres \
+            -c "CREATE DATABASE notify_test;"
+
+      - name: Run migrations
+        run: npm run migrate:deploy:all
+
+      - name: Build services
+        run: npm run build
+
+      - name: Run tests
+        run: npm test -- --passWithNoTests
