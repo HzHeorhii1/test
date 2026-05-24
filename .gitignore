@@ -1,3 +1,9 @@
+# Generated proto types
+libs/proto/src/generated/
+
+# Environment
+.env
+
 # Logs
 logs
 *.log

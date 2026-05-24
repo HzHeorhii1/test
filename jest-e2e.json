@@ -1,0 +1,17 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": "\\.e2e-spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": "tsconfig.json" }]
+  },
+  "moduleNameMapper": {
+    "@spherax/common/(.*)": "<rootDir>/libs/common/src/$1",
+    "@spherax/common": "<rootDir>/libs/common/src",
+    "@spherax/proto/(.*)": "<rootDir>/libs/proto/src/$1",
+    "@spherax/proto": "<rootDir>/libs/proto/src",
+    "@spherax/auth/(.*)": "<rootDir>/libs/auth/src/$1",
+    "@spherax/auth": "<rootDir>/libs/auth/src"
+  }
+}
