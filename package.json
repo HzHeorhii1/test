@@ -23,7 +23,11 @@
     "migrate:notify": "prisma migrate dev --schema services/notify/prisma/schema.prisma",
     "migrate:all": "npm run migrate:iam && npm run migrate:notify",
     "prepare": "husky",
-    "format:write": "prettier --write ."
+    "format:write": "prettier --write .",
+    "build": "npm run build:iam && npm run build:notify",
+    "migrate:deploy:iam": "prisma migrate deploy --schema services/iam/prisma/schema.prisma",
+    "migrate:deploy:notify": "prisma migrate deploy --schema services/notify/prisma/schema.prisma",
+    "migrate:deploy:all": "npm run migrate:deploy:iam && npm run migrate:deploy:notify"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.11.0",
