@@ -1,0 +1,87 @@
+services:
+  iam:
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile
+    environment:
+      SERVICE_NAME: iam
+      NODE_ENV: development
+      IAM_REST_PORT: 3001
+      IAM_GRPC_PORT: 5001
+      IAM_JWT_SECRET: dev-secret-change-me
+      IAM_JWT_EXPIRES_IN: 3600
+      DATABASE_URL_IAM: postgres://postgres:postgres@db:5432/iam_dev
+      NOTIFY_GRPC_HOST: notify
+      NOTIFY_GRPC_PORT_INTERNAL: 5002
+    ports:
+      - '3001:3001'
+      - '5001:5001'
+    volumes:
+      - .:/app
+      - iam-node-modules:/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "fetch('http://127.0.0.1:3001/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  notify:
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile
+    environment:
+      SERVICE_NAME: notify
+      NODE_ENV: development
+      NOTIFY_REST_PORT: 3002
+      NOTIFY_GRPC_PORT: 5002
+      DATABASE_URL_NOTIFY: postgres://postgres:postgres@db:5432/notify_dev
+      IAM_GRPC_HOST: iam
+      IAM_GRPC_PORT_INTERNAL: 5001
+    ports:
+      - '3002:3002'
+      - '5002:5002'
+    volumes:
+      - .:/app
+      - notify-node-modules:/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+      iam:
+        condition: service_started
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "fetch('http://127.0.0.1:3002/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  iam-node-modules:
+  notify-node-modules:
+  postgres-data:
