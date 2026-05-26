@@ -44,6 +44,11 @@ services:
       DATABASE_URL_NOTIFY: postgres://postgres:postgres@db:5432/notify_dev
       IAM_GRPC_HOST: iam
       IAM_GRPC_PORT_INTERNAL: 5001
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_FROM: noreply@spherax.local
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
       - '3002:3002'
       - '5002:5002'
@@ -55,6 +60,10 @@ services:
         condition: service_healthy
       iam:
         condition: service_started
+      mailpit:
+        condition: service_started
+      redis:
+        condition: service_healthy
     healthcheck:
       test:
         - CMD-SHELL
@@ -64,6 +73,24 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
     image: postgres:17-alpine
@@ -85,3 +112,4 @@ volumes:
   iam-node-modules:
   notify-node-modules:
   postgres-data:
+  redis-data:

@@ -24,7 +24,9 @@
       "@spherax/proto": ["libs/proto/src"],
       "@spherax/proto/*": ["libs/proto/src/*"],
       "@spherax/auth": ["libs/auth/src"],
-      "@spherax/auth/*": ["libs/auth/src/*"]
+      "@spherax/auth/*": ["libs/auth/src/*"],
+      "generated/iam-client/*": ["generated/iam-client/*"],
+      "generated/notify-client/*": ["generated/notify-client/*"]
     }
   }
 }

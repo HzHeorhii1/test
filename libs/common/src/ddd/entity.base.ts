@@ -5,8 +5,7 @@ export abstract class EntityBase<TId> {
     return this._id;
   }
 
-  equals(other?: EntityBase<TId>): boolean {
-    if (!other) return false;
+  equals(other: EntityBase<TId>): boolean {
     return this._id === other._id;
   }
 }

@@ -1,11 +1,9 @@
-type VersionMapper<T, R> = (domain: T) => R;
-
 export class VersionedResponseMapper {
-  static map<T, R = unknown>(
+  static map<T>(
     domain: T,
     version: number,
-    mappers: Record<number, VersionMapper<T, R>>,
-  ): R {
+    mappers: Record<number, (d: T) => unknown> & { 1: (d: T) => unknown },
+  ): unknown {
     const fn = mappers[version] ?? mappers[1];
     return fn(domain);
   }

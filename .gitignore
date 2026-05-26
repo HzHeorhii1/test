@@ -1,6 +1,12 @@
 # Generated proto types
 libs/proto/src/generated/
 
+# Generated gRPC/Prisma clients
+generated/
+
+# Planning and design docs (internal only)
+docs/
+
 # Environment
 .env
 

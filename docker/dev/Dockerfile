@@ -4,7 +4,7 @@ WORKDIR /app
 
 ENV NODE_ENV=development
 
-RUN apk add --no-cache protobuf
+RUN apk add --no-cache protobuf python3 make g++
 
 COPY package.json package-lock.json ./
 COPY docker/dev/entrypoint.sh /entrypoint.sh

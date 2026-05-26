@@ -1,0 +1,31 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../../../generated/notify-client"
+}
+
+model Notification {
+  id        String            @id @default(uuid())
+  userId    String
+  channel   String
+  message   String
+  status    String            @default("PENDING")
+  createdAt DateTime          @default(now())
+  attempts  DeliveryAttempt[]
+
+  @@index([userId])
+}
+
+model DeliveryAttempt {
+  id             String       @id @default(uuid())
+  notificationId String
+  attemptedAt    DateTime     @default(now())
+  success        Boolean
+  error          String?
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([notificationId])
+}

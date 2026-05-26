@@ -1,5 +1,5 @@
-export interface IRepository<T, TId> {
+export interface IRepository<T> {
+  findById(id: string): Promise<T | null>;
   save(entity: T): Promise<void>;
-  findById(id: TId): Promise<T | null>;
-  delete(id: TId): Promise<void>;
+  delete(id: string): Promise<void>;
 }

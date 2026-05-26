@@ -1,20 +1,17 @@
 import { DomainEventBase } from './domain-event.base';
-import { EntityBase } from './entity.base';
 
-export abstract class AggregateRootBase<TId> extends EntityBase<TId> {
+export abstract class AggregateRootBase {
   private _domainEvents: DomainEventBase[] = [];
 
-  get domainEvents(): ReadonlyArray<DomainEventBase> {
-    return this._domainEvents;
+  get domainEvents(): DomainEventBase[] {
+    return [...this._domainEvents];
   }
 
   protected addDomainEvent(event: DomainEventBase): void {
     this._domainEvents.push(event);
   }
 
-  pullDomainEvents(): DomainEventBase[] {
-    const events = [...this._domainEvents];
+  clearDomainEvents(): void {
     this._domainEvents = [];
-    return events;
   }
 }

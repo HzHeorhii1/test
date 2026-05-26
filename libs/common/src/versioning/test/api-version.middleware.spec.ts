@@ -1,45 +1,41 @@
-import { API_VERSION_HEADER, ApiVersionMiddleware } from './api-version.middleware';
-import { Request, Response } from 'express';
-
-type VersionedRequest = Request & { apiVersion: number };
+import { Response } from 'express';
+import { ApiVersionMiddleware, VersionedRequest } from '../api-version.middleware';
 
 describe('ApiVersionMiddleware', () => {
-  let middleware: ApiVersionMiddleware;
-  let next: jest.Mock;
+  const middleware = new ApiVersionMiddleware();
+  const next = jest.fn();
+  const res = {} as Response;
 
-  beforeEach(() => {
-    middleware = new ApiVersionMiddleware();
-    next = jest.fn();
+  function makeReq(header?: string): VersionedRequest {
+    return { headers: { 'x-spherax-api-version': header } } as unknown as VersionedRequest;
+  }
+
+  it('sets apiVersion=1 when header is absent', () => {
+    const req = makeReq(undefined);
+    middleware.use(req, res, next);
+    expect(req.apiVersion).toBe(1);
   });
 
-  const makeReq = (headerValue?: string): VersionedRequest => {
-    const headers: Record<string, string> = {};
-    if (headerValue !== undefined) headers[API_VERSION_HEADER] = headerValue;
-    return { headers } as unknown as VersionedRequest;
-  };
-
-  it('sets apiVersion from a valid header', () => {
+  it('parses version 2 from header', () => {
     const req = makeReq('2');
-    middleware.use(req, {} as Response, next);
+    middleware.use(req, res, next);
     expect(req.apiVersion).toBe(2);
+  });
+
+  it('defaults to 1 for non-numeric header', () => {
+    const req = makeReq('abc');
+    middleware.use(req, res, next);
+    expect(req.apiVersion).toBe(1);
+  });
+
+  it('defaults to 1 for zero', () => {
+    const req = makeReq('0');
+    middleware.use(req, res, next);
+    expect(req.apiVersion).toBe(1);
+  });
+
+  it('calls next()', () => {
+    middleware.use(makeReq('1'), res, next);
     expect(next).toHaveBeenCalled();
-  });
-
-  it('defaults to 1 when header is missing', () => {
-    const req = makeReq();
-    middleware.use(req, {} as Response, next);
-    expect(req.apiVersion).toBe(1);
-  });
-
-  it('defaults to 1 when header is non-numeric', () => {
-    const req = makeReq('foo');
-    middleware.use(req, {} as Response, next);
-    expect(req.apiVersion).toBe(1);
-  });
-
-  it('defaults to 1 when header is empty string', () => {
-    const req = makeReq('');
-    middleware.use(req, {} as Response, next);
-    expect(req.apiVersion).toBe(1);
   });
 });
