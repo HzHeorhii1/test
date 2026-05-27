@@ -21,5 +21,11 @@ CREATE TABLE "DeliveryAttempt" (
     CONSTRAINT "DeliveryAttempt_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
+CREATE INDEX "Notification_userId_idx" ON "Notification"("userId");
+
+-- CreateIndex
+CREATE INDEX "DeliveryAttempt_notificationId_idx" ON "DeliveryAttempt"("notificationId");
+
 -- AddForeignKey
 ALTER TABLE "DeliveryAttempt" ADD CONSTRAINT "DeliveryAttempt_notificationId_fkey" FOREIGN KEY ("notificationId") REFERENCES "Notification"("id") ON DELETE CASCADE ON UPDATE CASCADE;

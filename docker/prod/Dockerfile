@@ -23,13 +23,13 @@ ENV SERVICE_NAME=${SERVICE_NAME}
 ENV NODE_ENV=production
 
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN NODE_ENV=production npm ci --omit=dev && npm cache clean --force
 
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=build /app/generated ./generated
 COPY --from=build /app/libs/proto/src/proto ./libs/proto/src/proto
 COPY --from=build /app/services/${SERVICE_NAME}/prisma ./prisma
 
 EXPOSE 3001 3002 5001 5002
 
-CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma && node dist/services/${SERVICE_NAME}/src/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --config ./prisma/prisma.config.ts && node dist/services/${SERVICE_NAME}/src/main.js"]
