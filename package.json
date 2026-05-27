@@ -122,7 +122,9 @@
       "@spherax/proto/(.*)": "<rootDir>/libs/proto/src/$1",
       "@spherax/proto": "<rootDir>/libs/proto/src",
       "@spherax/auth/(.*)": "<rootDir>/libs/auth/src/$1",
-      "@spherax/auth": "<rootDir>/libs/auth/src"
+      "@spherax/auth": "<rootDir>/libs/auth/src",
+      "generated/iam-client/(.*)": "<rootDir>/generated/iam-client/$1",
+      "generated/notify-client/(.*)": "<rootDir>/generated/notify-client/$1"
     }
   },
   "lint-staged": {
