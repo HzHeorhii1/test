@@ -25,9 +25,20 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      redis:
+        image: redis:7-alpine
+        ports:
+          - '6379:6379'
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
     env:
       DATABASE_URL_IAM: postgresql://postgres:postgres@localhost:5432/iam_test
       DATABASE_URL_NOTIFY: postgresql://postgres:postgres@localhost:5432/notify_test
+      IAM_JWT_SECRET: ${{ secrets.IAM_JWT_SECRET || 'ci-test-secret-not-for-production' }}
 
     steps:
       - name: Checkout
